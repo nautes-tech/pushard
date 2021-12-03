@@ -1,0 +1,64 @@
+name: pushard
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployHash:
+        description: 'Target deploy hash'
+        required: true
+      skipHashes:
+        description: 'Deploys to skip'
+        required: false
+      dstBranch:
+        description: 'Destination branch'
+        required: true
+
+jobs:
+  run_pushard:
+    name: Run PUSHARD
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: '14'
+
+      - name: Create working dir
+        shell: bash
+        run: mkdir tempdir
+
+      - name: Install AWS CLI version 2
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          sudo unzip awscliv2.zip
+          sudo ./aws/install
+          sudo rm -rf awscliv2.zip
+          sudo rm -rf aws
+          aws --version
+
+      - name: Install @aws-amplify/cli node package
+        run: npm install -g @aws-amplify/cli@7.3.2
+
+      - name: PUSHARD
+        run: |
+          echo "Target deploy hash: ${{ github.event.inputs.deployHash }}"
+          echo "Deploys to skip: ${{ github.event.inputs.skipHashes }}"
+          echo "Destination branch: ${{ github.event.inputs.dstBranch }}"
+          cd builder
+          npm install
+          npm start
+        env:
+          DEPLOY_HASH: ${{ github.event.inputs.deployHash }}
+          SKIP_HASHES: ${{ github.event.inputs.skipHashes }}
+          DST_BRANCH: ${{ github.event.inputs.dstBranch }}
+          AMPLIFY_PROJECT_REPO: ${{ secrets.AMPLIFY_PROJECT_REPO }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_PROFILE: ${{ secrets.AWS_PROFILE }}
+          GH_USERNAME: ${{ secrets.GH_USERNAME }}
+          GH_USER_PAT: ${{ secrets.GH_USER_PAT }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

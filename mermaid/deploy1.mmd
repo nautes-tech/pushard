@@ -1,0 +1,9 @@
+sequenceDiagram
+    autonumber
+    actor developer
+    participant dev
+    actor gitaction
+    participant prod
+    developer-)dev: commit_1 hash-123456
+    dev-)gitaction: DEPLOY_HASH 123456
+    gitaction-)prod: only one deploy loop with commit 123456

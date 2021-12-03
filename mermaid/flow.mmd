@@ -1,0 +1,11 @@
+flowchart TD
+    A[Start] --> B[get hash of commit to deploy];
+    B --> C[detect commits between last deploy hash and target deploy hash];
+    C --> D[merge current deploy commit to deploy branch];
+    subgraph LOOP FOR EACH COMMIT TO MOVE
+    D --> E[amplify init to detect new lambda functions];
+    E --> F[amplify push];
+    F --> G[git commit];
+    end
+    G --> H[git push];
+    H --> J[End];
