@@ -97,7 +97,7 @@ jobs:
 
       - name: Create working dir
         shell: bash
-        run: mkdir tempdir
+        run: mkdir pushard_temp_dir
 
       - name: Install @aws-amplify/cli node package
         run: npm install -g @aws-amplify/cli@7.3.2
